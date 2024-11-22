@@ -45,7 +45,9 @@ mod tests {
         let mut client = KaiaScan::new().unwrap();
         client.set_base_url(&mock_base_url); // Assume a `set_base_url` method exists
 
-        let result = client.get_fungible_token(Address::new(token_address.into())).await;
+        let result = client
+            .get_fungible_token(Address::new(token_address.into()))
+            .await;
 
         assert!(result.is_ok());
         let response = result.unwrap();

@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use std::time::Duration;
 
 const BASE_URL: &str = "https://mainnet-oapi.kaiascan.io/";
-const AUTH_TOKEN: &'static str = "edcdd09d-82c1-4056-963e-9f5a14f7d6cf";
+const AUTH_TOKEN: &'static str = "";
 const TOKENS_ENDPOINT: &str = "api/v1/tokens";
 const NFTS_ENDPOINT: &str = "api/v1/nfts";
 
@@ -87,22 +87,12 @@ pub struct BlockRewardsResponse {
     pub total_fee: String,
 }
 
-
 // #[derive(Debug, Deserialize)]
 // pub struct BlockBurns {
 //     pub block_id: i64,
 //     pub amount: String,
 //     pub datetime: String,
 // }
-// #[derive(Debug, Deserialize)]
-// pub struct Paging {
-//     pub current_page: u32,
-//     pub total_page: u32,
-//     pub total_count: u64,
-//     pub last: bool,
-// }
-
-
 #[derive(Debug, Deserialize)]
 pub struct BurnSummary {
     pub accumulate_burnt: String,
@@ -110,12 +100,6 @@ pub struct BurnSummary {
     pub accumulate_burnt_kaia: String,
     pub kip103_burnt: String,
     pub kip160_burnt: String,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct BlockBurnsResponse {
-    pub nearest_block_number: i64,
-    pub summary: BurnSummary,
 }
 
 #[derive(Debug, Deserialize)]
@@ -425,7 +409,7 @@ impl KaiaScan {
         &self,
         page: Option<i32>,
         size: Option<i32>,
-    ) -> Result<BlockBurnsResponse> {
+    ) -> Result<BurnSummary> {
         let page = page.unwrap_or(1);
         let size = size.unwrap_or(20);
 
@@ -484,49 +468,13 @@ impl KaiaScan {
         self.fetch_api(&url).await
     }
 
-    pub async fn get_transaction_status(&self, transaction_hash: &str) -> Result<TransactionStatus> {
+    pub async fn get_transaction_status(
+        &self,
+        transaction_hash: &str,
+    ) -> Result<TransactionStatus> {
         let url = format!(
             "{}api/v1/transactions/{}/status",
             BASE_URL, transaction_hash
-        );
-        self.fetch_api(&url).await
-    }
-
-    // Enhance the existing get_blocks method to match TypeScript functionality
-    pub async fn get_blocks_enhanced(
-        &self,
-        block_number: i64,
-        block_number_start: Option<i64>,
-        block_number_end: Option<i64>,
-        page: Option<i32>,
-        size: Option<i32>,
-    ) -> Result<BlocksResponse> {
-        let mut query_params = vec![format!("blockNumber={}", block_number)];
-        
-        if let Some(start) = block_number_start {
-            query_params.push(format!("blockNumberStart={}", start));
-        }
-        
-        if let Some(end) = block_number_end {
-            query_params.push(format!("blockNumberEnd={}", end));
-        }
-        
-        if let Some(p) = page {
-            if p >= 1 {
-                query_params.push(format!("page={}", p));
-            }
-        }
-        
-        if let Some(s) = size {
-            if s >= 1 && s <= 2000 {
-                query_params.push(format!("size={}", s));
-            }
-        }
-
-        let url = format!(
-            "{}api/v1/blocks?{}",
-            BASE_URL,
-            query_params.join("&")
         );
         self.fetch_api(&url).await
     }
