@@ -9,7 +9,8 @@ Getting Started
 -Navigate to API section in your profile
 -Generate a new API key for mainnet access
 -Copy your Bearer token (format:edcdd09d-XXXX-XXXX-XXXX-XXXXXXXXXXXX)
-2. ## Create new Rust project
+
+2.  Create new Rust project
 cargo new kaia_scan_project
 `cd kaia_scan_project`
 
