@@ -28,15 +28,14 @@ serde_json = "1.0"
 anyhow = "1.0"
 ```
 3. ## Configure SDK AUTH And Run the code
-`cargo run --example basic`
+`cargo run`
 
-## Test specific endpoints
-`cargo test --test integration_tests`
+
 
 ##  Query token information
 `let token = client.get_fungible_token("0x5c74070fdea071359b86082bd9f9b3deaafbe32b").await?;`
 
-// Get NFT details
+Get NFT details
 `let nft = client.get_nft_item(nft_address, token_id).await?;`
 
 ## Support
