@@ -5,9 +5,13 @@ Getting Started
 1. Obtain API 
 
 -Visit KaiaScan
+
 -Create an account or sign in
+
 -Navigate to API section in your profile
+
 -Generate a new API key for mainnet access
+
 -Copy your Bearer token (format:edcdd09d-XXXX-XXXX-XXXX-XXXXXXXXXXXX)
 
 2.  Create new Rust project
