@@ -77,5 +77,74 @@ async fn main() -> anyhow::Result<()> {
         }
     }
 
+    match client.get_kaia_info().await {
+        Ok(info) => {
+            println!("\n💎 Kaia Information:");
+            println!("\nPrice Information:");
+            println!("  USD Price: ${}", info.klay_price.usd_price);
+            println!("  BTC Price: ₿{}", info.klay_price.btc_price);
+            println!("  Market Cap: ${}", info.klay_price.market_cap);
+            println!("  24h Price Change: {}%", info.klay_price.usd_price_changes);
+            println!("  Volume: ${}", info.klay_price.volume);
+            println!("  Total Supply: {}", info.klay_price.total_supply);
+            
+            println!("\nNetwork Summary:");
+            println!("  1h Avg Block Time: {}", info.summary.avg_block_time1h);
+            println!("  24h Avg Block Time: {}", info.summary.avg_block_time24h);
+            println!("  24h Avg Tx per Block: {:.2}", info.summary.avg_tx_per_block24h);
+            println!("  Consensus Nodes: {}", info.summary.consensus_node);
+        }
+        Err(e) => {
+            println!("❌ Error getting Kaia information: {}", e);
+        }
+    }
+    
+    // Get Block Rewards
+    let block_number = 16973854;
+    println!("\n🏆 Querying block rewards for block number: {}", block_number);
+    
+    match client.get_block_rewards(block_number).await {
+        Ok(rewards) => {
+            println!("\n📋 Block Rewards Information:");
+            println!("Minted: {} KLAY", rewards.minted);
+            println!("Total Fee: {} KLAY", rewards.total_fee);
+            println!("Burnt Fee: {} KLAY", rewards.burnt_fee);
+            
+            println!("\nDistributions:");
+            for dist in rewards.distributions {
+                println!("  {} KLAY to {}", dist.amount, dist.distribution_type);
+            }
+            
+            println!("\nRecipients:");
+            for recipient in rewards.recipients {
+                println!("\n  Name: {}", recipient.name);
+                println!("  Address: {}", recipient.address);
+                println!("  Amount: {} KLAY", recipient.amount);
+                println!("  Type: {}", recipient.reward_type);
+            }
+        }
+        Err(e) => {
+            println!("❌ Error getting block rewards: {}", e);
+        }
+    }
+
+    println!("\n🔥 Querying latest block burns...");
+    match client.get_block_burns(1697385) .await {
+        Ok(burns) => {
+            println!("\n📋 Latest Block Burns Information:");
+            println!("Accumulate Burnt: {}", burns.accumulate_burnt);
+            println!("Accumulate Burnt Fees: {}", burns.accumulate_burnt_fees);
+            println!("Accumulate Burnt Kaia: {}", burns.accumulate_burnt_kaia);
+            println!("KIP103 Burnt: {}", burns.kip103_burnt);
+            println!("KIP160 Burnt: {}", burns.kip160_burnt);
+        },
+        Err(e) => {
+            println!("❌ Error getting latest block burns: {}", e);
+        }
+    }
+    
+
+
+
     Ok(())
 }
