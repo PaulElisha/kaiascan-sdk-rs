@@ -3,7 +3,6 @@ use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use std::time::Duration;
 
-
 const MAINNET_BASE_URL: &str = "https://mainnet-oapi.kaiascan.io/";
 const TESTNET_BASE_URL: &str = "https://kairos-oapi.kaiscan.io/";
 
@@ -377,20 +376,20 @@ impl KaiaScan {
     ) -> Result<BlocksListResponse> {
         let page = page.unwrap_or(1).max(1);
         let size = size.unwrap_or(20).clamp(1, 2000);
-    
+
         let mut query_params = vec![format!("blockNumber={}", block_number)];
-    
+
         if let Some(start) = block_number_start {
             query_params.push(format!("blockNumberStart={}", start));
         }
-    
+
         if let Some(end) = block_number_end {
             query_params.push(format!("blockNumberEnd={}", end));
         }
-    
+
         query_params.push(format!("page={}", page));
         query_params.push(format!("size={}", size));
-    
+
         let endpoint = format!("api/v1/blocks?{}", query_params.join("&"));
         self.fetch_api(&endpoint).await
     }
