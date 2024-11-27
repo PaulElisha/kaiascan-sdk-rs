@@ -4,14 +4,18 @@ use rustsdk::{Address, KaiaScan};
 async fn main() -> anyhow::Result<()> {
     println!("Starting KaiaScan SDK example...");
 
-    let client = KaiaScan::new()?;
-    println!("✅ Client initialized successfully");
+    let mainnet_client = KaiaScan::new(false)?;
+    println!("✅ Mainnet Client initialized successfully");
+
+    // Create client for testnet
+    let testnet_client = KaiaScan::new(true)?;
+    println!("✅ Testnet Client initialized successfully");
 
     let token_address = Address::new("0x5c74070fdea071359b86082bd9f9b3deaafbe32b");
     println!("🔍 Querying token address: {}", token_address.as_ref());
 
     // Get token info
-    match client.get_fungible_token(token_address).await {
+    match mainnet_client.get_fungible_token(token_address).await {
         Ok(response) => {
             println!("\n📋 Token Information:");
             println!("Name: {}", response.name);
@@ -26,7 +30,7 @@ async fn main() -> anyhow::Result<()> {
     }
 
     // latest block
-    match client.get_latest_block().await {
+    match mainnet_client.get_latest_block().await {
         Ok(block) => {
             println!("\n🔲 Latest Block Information:");
             println!("Block ID: {}", block.block_id);
@@ -49,7 +53,7 @@ async fn main() -> anyhow::Result<()> {
         block_number
     );
 
-    match client.get_transactions_of_block(block_number).await {
+    match mainnet_client.get_transactions_of_block(block_number).await {
         Ok(response) => {
             println!("\n📋 Transactions Information:");
             println!("Paging: {:#?}", response.paging);
@@ -76,7 +80,7 @@ async fn main() -> anyhow::Result<()> {
         }
     }
 
-    match client.get_kaia_info().await {
+    match mainnet_client.get_kaia_info().await {
         Ok(info) => {
             println!("\n💎 Kaia Information:");
             println!("\nPrice Information:");
@@ -108,7 +112,7 @@ async fn main() -> anyhow::Result<()> {
         block_number
     );
 
-    match client.get_block_rewards(block_number).await {
+    match mainnet_client.get_block_rewards(block_number).await {
         Ok(rewards) => {
             println!("\n📋 Block Rewards Information:");
             println!("Minted: {} KLAY", rewards.minted);
@@ -134,7 +138,7 @@ async fn main() -> anyhow::Result<()> {
     }
 
     println!("\n🔥 Querying latest block burns...");
-    match client.get_block_burns(16973854).await {
+    match mainnet_client.get_block_burns(16973854).await {
         Ok(burns) => {
             println!("\n📋 Latest Block Burns Information:");
             println!("Accumulate Burnt: {}", burns.accumulate_burnt);
@@ -148,7 +152,7 @@ async fn main() -> anyhow::Result<()> {
         }
     }
 
-    match client.get_latest_block_burns(Some(2), Some(5)).await {
+    match mainnet_client.get_latest_block_burns(Some(2), Some(5)).await {
         Ok(burns_response) => {
             println!("\n📋 Latest Block Burns Information:");
             println!("Accumulated Burnt: {}", burns_response.accumulate_burnt);
@@ -168,6 +172,9 @@ async fn main() -> anyhow::Result<()> {
             println!("❌ Error getting latest block burns: {}", e);
         }
     }
+
+//mainnet_client.get_blocks(123456, None, None, None, None).await?;
+
 
     Ok(())
 }
