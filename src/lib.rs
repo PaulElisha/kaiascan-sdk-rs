@@ -3,12 +3,9 @@ use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use std::time::Duration;
 
-//const BASE_URL: &str = "https://mainnet-oapi.kaiascan.io/";
 
 const MAINNET_BASE_URL: &str = "https://mainnet-oapi.kaiascan.io/";
 const TESTNET_BASE_URL: &str = "https://kairos-oapi.kaiscan.io/";
-
-// Keep other existing constants and structs from the previous implementation
 
 pub struct KaiaScan {
     client: Client,
@@ -19,7 +16,6 @@ const AUTH_TOKEN: &'static str = "";
 const TOKENS_ENDPOINT: &str = "api/v1/tokens";
 const NFTS_ENDPOINT: &str = "api/v1/nfts";
 
-// Custom type for blockchain addresses
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Address(String);
 
@@ -266,6 +262,30 @@ pub struct TokenInfo {
     pub total_burns: i64,
 }
 
+#[derive(Debug, Deserialize)]
+pub struct BlocksListResponse {
+    pub paging: Paging,
+    pub results: Vec<BlockListItem>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct BlockListItem {
+    #[serde(rename = "base_fee_per_gas")]
+    pub base_fee_per_gas: String,
+    #[serde(rename = "block_id")]
+    pub block_id: i64,
+    #[serde(rename = "block_proposer")]
+    pub block_proposer: String,
+    #[serde(rename = "block_size")]
+    pub block_size: i64,
+    #[serde(rename = "burnt_fees")]
+    pub burnt_fees: String,
+    pub datetime: String,
+    pub reward: String,
+    #[serde(rename = "total_transaction_count")]
+    pub total_transaction_count: i64,
+}
+
 impl KaiaScan {
     pub fn new(is_testnet: bool) -> Result<Self> {
         let base_url = if is_testnet {
@@ -347,33 +367,33 @@ impl KaiaScan {
         self.fetch_api(&url).await
     }
 
-    // pub async fn get_blocks(
-    //     &self,
-    //     block_number: i64,
-    //     block_number_start: Option<i64>,
-    //     block_number_end: Option<i64>,
-    //     page: Option<i32>,
-    //     size: Option<i32>,
-    // ) -> Result<BlocksResponse> {
-    //     let page = page.unwrap_or(1).max(1);
-    //     let size = size.unwrap_or(20).clamp(1, 2000);
+    pub async fn get_blocks(
+        &self,
+        block_number: i64,
+        block_number_start: Option<i64>,
+        block_number_end: Option<i64>,
+        page: Option<i32>,
+        size: Option<i32>,
+    ) -> Result<BlocksListResponse> {
+        let page = page.unwrap_or(1).max(1);
+        let size = size.unwrap_or(20).clamp(1, 2000);
     
-    //     let mut query_params = vec![format!("blockNumber={}", block_number)];
+        let mut query_params = vec![format!("blockNumber={}", block_number)];
     
-    //     if let Some(start) = block_number_start {
-    //         query_params.push(format!("blockNumberStart={}", start));
-    //     }
+        if let Some(start) = block_number_start {
+            query_params.push(format!("blockNumberStart={}", start));
+        }
     
-    //     if let Some(end) = block_number_end {
-    //         query_params.push(format!("blockNumberEnd={}", end));
-    //     }
+        if let Some(end) = block_number_end {
+            query_params.push(format!("blockNumberEnd={}", end));
+        }
     
-    //     query_params.push(format!("page={}", page));
-    //     query_params.push(format!("size={}", size));
+        query_params.push(format!("page={}", page));
+        query_params.push(format!("size={}", size));
     
-    //     let endpoint = format!("api/v1/blocks?{}", query_params.join("&"));
-    //     self.fetch_api(&endpoint).await
-    // }
+        let endpoint = format!("api/v1/blocks?{}", query_params.join("&"));
+        self.fetch_api(&endpoint).await
+    }
 
     pub async fn get_transactions_of_block(
         &self,

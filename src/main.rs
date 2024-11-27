@@ -175,6 +175,31 @@ async fn main() -> anyhow::Result<()> {
 
 //mainnet_client.get_blocks(123456, None, None, None, None).await?;
 
+match mainnet_client.get_blocks(block_number, None, None, Some(2), Some(5)).await {
+    Ok(response) => {
+        println!("\n📋 Blocks Information:");
+      //  println!("Blocks: {:#?}", block);
+        println!("Total Blocks: {}", response.results.len());
+        
+        for block in response.results {
+        
+        // for block in response.blocks {
+            println!("\nBlock:");
+            println!("  Block ID: {}", block.block_id);
+            println!("  DateTime: {}", block.datetime);
+            println!("  Total Transactions: {}", block.total_transaction_count);
+            println!("  Block Reward:");
+            println!("  Block Size: {}", block.block_size);
+            println!("  Burnt Fees: {}", block.burnt_fees);
+            println!("  Reward: {}", block.reward);
+            println!("  Total Transactions: {}", block.total_transaction_count);
+        }
+    }
+    Err(e) => {
+        println!("❌ Error getting blocks: {}", e);
+    }
+}
+
 
     Ok(())
 }
