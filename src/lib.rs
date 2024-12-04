@@ -241,6 +241,251 @@ pub struct LatestBlock {
     pub block_reward: BlockReward,
 }
 
+struct KeyHistoryEntry;
+#[derive(Debug, Serialize, Deserialize)]
+pub struct EventLogEntry {
+    pub results: Vec<EventLogResult>,
+
+    pub pagings: Pagings,
+
+    pub property: serde_json::Value, //  `HashMap<String, String>`
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct EventLogResult {
+    pub log_index: u32,
+
+    pub contract_address: String,
+
+    pub log_type: String,
+
+    pub topics: Vec<String>,
+
+    pub data: String,
+
+    pub items: Vec<EventItem>,
+
+    pub block_number: u64,
+
+    pub transaction_hash: String,
+
+    pub estimated_event_log: bool,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct EventItem {
+    pub name: String,
+
+    pub value: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Pagings {
+    pub total_count: u32,
+
+    pub current_page: u32,
+
+    pub last: bool,
+
+    pub total_page: u32,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct TokenTransferEntry {
+    #[serde(rename = "results")]
+    pub results: Vec<TokenTransfer>,
+
+    #[serde(rename = "paging")]
+    pub paging: Paging,
+
+    #[serde(rename = "property")]
+    pub property: Option<serde_json::Value>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct TokenTransfer {
+    pub contract: ContractInfo,
+
+    #[serde(rename = "blockId")]
+    pub block_id: u64,
+
+    #[serde(rename = "transactionHash")]
+    pub transaction_hash: String,
+
+    #[serde(rename = "feePayer")]
+    pub fee_payer: String,
+
+    #[serde(rename = "transactionIndex")]
+    pub transaction_index: u32,
+
+    pub datetime: String,
+
+    pub from: String,
+
+    pub to: String,
+
+    pub amount: u64,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ContractInfo {
+    pub contract_address: String,
+    pub contract_type: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct NftBalanceEntry {
+    pub results: Vec<NftBalance>,
+
+    pub paging: Paging,
+
+    pub property: Option<serde_json::Value>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct NftBalance {
+    pub contract: ContractInfo,
+
+    #[serde(rename = "tokenId")]
+    pub token_id: String,
+
+    #[serde(rename = "tokenCount")]
+    pub token_count: u64,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct NftTransferEntry {
+    #[serde(rename = "results")]
+    pub results: Vec<NftTransfer>,
+
+    #[serde(rename = "paging")]
+    pub paging: Paging,
+
+    #[serde(rename = "property")]
+    pub property: Option<serde_json::Value>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct NftTransfer {
+    pub contract: ContractInfo,
+
+    #[serde(rename = "blockId")]
+    pub block_id: u64,
+
+    #[serde(rename = "transactionHash")]
+    pub transaction_hash: String,
+
+    #[serde(rename = "feePayer")]
+    pub fee_payer: String,
+
+    #[serde(rename = "transactionIndex")]
+    pub transaction_index: u32,
+
+    pub datetime: String,
+
+    pub from: String,
+
+    pub to: String,
+
+    #[serde(rename = "tokenId")]
+    pub token_id: String,
+
+    #[serde(rename = "tokenCount")]
+    pub token_count: u64,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Pagin {
+    #[serde(rename = "totalCount")]
+    pub total_count: u32,
+
+    #[serde(rename = "currentPage")]
+    pub current_page: u32,
+
+    pub last: bool,
+
+    #[serde(rename = "totalPage")]
+    pub total_page: u32,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct TokenBalanceEntry {
+    pub results: Vec<TokenBalance>,
+
+    pub paging: Page,
+
+    pub property: Option<serde_json::Value>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct TokenBalance {
+    pub contract: ContractInfo,
+
+    pub balance: u64,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Page {
+    #[serde(rename = "totalCount")]
+    pub total_count: u32,
+
+    #[serde(rename = "currentPage")]
+    pub current_page: u32,
+
+    pub last: bool,
+
+    #[serde(rename = "totalPage")]
+    pub total_page: u32,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct TransactionInputData {
+    #[serde(rename = "originalValue")]
+    pub original_value: String,
+
+    #[serde(rename = "decodedValue")]
+    pub decoded_value: Option<DecodedValue>,
+
+    #[serde(rename = "utf8Value")]
+    pub utf8_value: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct DecodedValue {
+    pub signature: String,
+
+    #[serde(rename = "methodId")]
+    pub method_id: String,
+
+    pub parameters: Vec<DecodedParameter>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct DecodedParameter {
+    #[serde(rename = "type")]
+    pub param_type: String,
+
+    pub name: String,
+
+    pub value: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct InternalTransactionEntry {
+    pub signature: String,
+
+    pub method_id: String,
+
+    pub parameters: Vec<TransactionParameter>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct TransactionParameter {
+    pub param_type: String,
+
+    pub value: String,
+}
+
 #[derive(Debug, Deserialize)]
 pub struct TokenInfo {
     #[serde(rename = "contract_type")]
@@ -519,6 +764,313 @@ impl KaiaScan {
         transaction_hash: &str,
     ) -> Result<TransactionStatus> {
         let url = format!("api/v1/transactions/{}/status", transaction_hash);
+        self.fetch_api(&url).await
+    }
+
+    // Method to get account event logs
+    pub async fn get_account_event_logs(
+        &self,
+        account_address: Address,
+        page: Option<u32>,
+        size: Option<u32>,
+        signature: Option<String>,
+        block_number_start: Option<u64>,
+        block_number_end: Option<u64>,
+    ) -> Result<EventLogEntry> {
+        let page = page.unwrap_or(1);
+        let size = size.unwrap_or(20);
+
+        if page < 1 {
+            return Err(anyhow::anyhow!("Page must be >= 1"));
+        }
+        if size < 1 || size > 2000 {
+            return Err(anyhow::anyhow!("Size must be between 1 and 2000"));
+        }
+
+        let mut query_params = vec![format!("page={}", page), format!("size={}", size)];
+
+        if let Some(sig) = signature {
+            query_params.push(format!("signature={}", sig));
+        }
+
+        if let Some(start) = block_number_start {
+            query_params.push(format!("blockNumberStart={}", start));
+        }
+
+        if let Some(end) = block_number_end {
+            query_params.push(format!("blockNumberEnd={}", end));
+        }
+
+        let query_string = query_params.join("&");
+        let url = format!(
+            "{}api/v1/accounts/{}/event-logs?{}",
+            self.base_url,
+            account_address.as_ref(),
+            query_string
+        );
+
+        self.fetch_api(&url).await
+    }
+
+    // Method to get account NFT balances (KIP17)
+    pub async fn get_account_kip17_nft_balances(
+        &self,
+        account_address: Address,
+        page: Option<u32>,
+        size: Option<u32>,
+    ) -> Result<NftBalanceEntry> {
+        let page = page.unwrap_or(1);
+        let size = size.unwrap_or(20);
+
+        if page < 1 {
+            return Err(anyhow::anyhow!("Page must be >= 1"));
+        }
+        if size < 1 || size > 2000 {
+            return Err(anyhow::anyhow!("Size must be between 1 and 2000"));
+        }
+
+        let url = format!(
+            "{}api/v1/accounts/{}/nft-balances/kip17?page={}&size={}",
+            self.base_url,
+            account_address.as_ref(),
+            page,
+            size
+        );
+
+        self.fetch_api(&url).await
+    }
+
+    // Method to get account NFT balances (KIP37)
+    pub async fn get_account_kip37_nft_balances(
+        &self,
+        account_address: Address,
+        page: Option<u32>,
+        size: Option<u32>,
+    ) -> Result<NftBalanceEntry> {
+        let page = page.unwrap_or(1);
+        let size = size.unwrap_or(20);
+
+        if page < 1 {
+            return Err(anyhow::anyhow!("Page must be >= 1"));
+        }
+        if size < 1 || size > 2000 {
+            return Err(anyhow::anyhow!("Size must be between 1 and 2000"));
+        }
+
+        let url = format!(
+            "{}api/v1/accounts/{}/nft-balances/kip37?page={}&size={}",
+            self.base_url,
+            account_address.as_ref(),
+            page,
+            size
+        );
+
+        self.fetch_api(&url).await
+    }
+
+    pub async fn get_account_nft_transfers(
+        &self,
+        account_address: Address,
+        page: Option<u32>,
+        size: Option<u32>,
+        contract_address: Option<Address>,
+        block_number_start: Option<u64>,
+        block_number_end: Option<u64>,
+    ) -> Result<NftTransferEntry> {
+        let page = page.unwrap_or(1);
+        let size = size.unwrap_or(20);
+
+        if page < 1 {
+            return Err(anyhow::anyhow!("Page must be >= 1"));
+        }
+        if size < 1 || size > 2000 {
+            return Err(anyhow::anyhow!("Size must be between 1 and 2000"));
+        }
+
+        let mut query_params = vec![format!("page={}", page), format!("size={}", size)];
+
+        if let Some(contract) = contract_address {
+            query_params.push(format!("contractAddress={}", contract.as_ref()));
+        }
+
+        if let Some(start) = block_number_start {
+            query_params.push(format!("blockNumberStart={}", start));
+        }
+
+        if let Some(end) = block_number_end {
+            query_params.push(format!("blockNumberEnd={}", end));
+        }
+
+        let query_string = query_params.join("&");
+        let url = format!(
+            "{}api/v1/accounts/{}/nft-transfers?{}",
+            self.base_url,
+            account_address.as_ref(),
+            query_string
+        );
+
+        let raw_data: String = self.fetch_api(&url).await?;
+        let nft_transfers: NftTransferEntry = serde_json::from_str(&raw_data)?;
+        Ok(nft_transfers)
+    }
+
+    // Method to get account token balances
+    pub async fn get_account_token_balances(
+        &self,
+        account_address: Address,
+        page: Option<u32>,
+        size: Option<u32>,
+    ) -> Result<TokenBalanceEntry> {
+        let page = page.unwrap_or(1);
+        let size = size.unwrap_or(20);
+
+        if page < 1 {
+            return Err(anyhow::anyhow!("Page must be >= 1"));
+        }
+        if size < 1 || size > 2000 {
+            return Err(anyhow::anyhow!("Size must be between 1 and 2000"));
+        }
+
+        let url = format!(
+            "{}api/v1/accounts/{}/token-balances?page={}&size={}",
+            self.base_url,
+            account_address.as_ref(),
+            page,
+            size
+        );
+
+        self.fetch_api(&url).await
+    }
+
+    pub async fn get_transaction_input_data(
+        &self,
+        transaction_hash: &str,
+    ) -> Result<TransactionInputData> {
+        if transaction_hash.is_empty() {
+            return Err(anyhow::anyhow!("Transaction hash is required"));
+        }
+
+        let url = format!(
+            "{}api/v1/transactions/{}/input-data",
+            self.base_url, transaction_hash
+        );
+
+        self.fetch_api(&url).await
+    }
+
+    pub async fn get_transaction_event_logs(
+        &self,
+        transaction_hash: &str,
+        page: Option<u32>,
+        size: Option<u32>,
+        signature: Option<String>,
+    ) -> Result<EventLogEntry> {
+        let page = page.unwrap_or(1);
+        let size = size.unwrap_or(20);
+
+        if transaction_hash.is_empty() {
+            return Err(anyhow::anyhow!("Transaction hash is required"));
+        }
+        if page < 1 {
+            return Err(anyhow::anyhow!("Page must be >= 1"));
+        }
+        if size < 1 || size > 2000 {
+            return Err(anyhow::anyhow!("Size must be between 1 and 2000"));
+        }
+
+        let mut query_params = vec![format!("page={}", page), format!("size={}", size)];
+
+        if let Some(sig) = signature {
+            query_params.push(format!("signature={}", sig));
+        }
+
+        let query_string = query_params.join("&");
+        let url = format!(
+            "{}api/v1/transactions/{}/event-logs?{}",
+            self.base_url, transaction_hash, query_string
+        );
+
+        self.fetch_api(&url).await
+    }
+
+    pub async fn get_transaction_internal_transactions(
+        &self,
+        transaction_hash: &str,
+        page: Option<u32>,
+        size: Option<u32>,
+    ) -> Result<InternalTransactionEntry> {
+        let page = page.unwrap_or(1);
+        let size = size.unwrap_or(20);
+
+        if transaction_hash.is_empty() {
+            return Err(anyhow::anyhow!("Transaction hash is required"));
+        }
+        if page < 1 {
+            return Err(anyhow::anyhow!("Page must be >= 1"));
+        }
+        if size < 1 || size > 2000 {
+            return Err(anyhow::anyhow!("Size must be between 1 and 2000"));
+        }
+
+        let url = format!(
+            "{}api/v1/transactions/{}/internal-transactions?page={}&size={}",
+            self.base_url, transaction_hash, page, size
+        );
+
+        self.fetch_api(&url).await
+    }
+
+    pub async fn get_transaction_token_transfers(
+        &self,
+        transaction_hash: &str,
+        page: Option<u32>,
+        size: Option<u32>,
+    ) -> Result<TokenTransferEntry> {
+        let page = page.unwrap_or(1);
+        let size = size.unwrap_or(20);
+
+        if transaction_hash.is_empty() {
+            return Err(anyhow::anyhow!("Transaction hash is required"));
+        }
+        if page < 1 {
+            return Err(anyhow::anyhow!("Page must be >= 1"));
+        }
+        if size < 1 || size > 2000 {
+            return Err(anyhow::anyhow!("Size must be between 1 and 2000"));
+        }
+
+        let url = format!(
+            "{}api/v1/transactions/{}/token-transfers?page={}&size={}",
+            self.base_url, transaction_hash, page, size
+        );
+
+        self.fetch_api(&url).await
+    }
+
+    pub async fn get_transaction_nft_transfers(
+        &self,
+        transaction_hash: &str,
+        page: Option<u32>,
+        size: Option<u32>,
+    ) -> Result<NftTransferEntry> {
+        let page = page.unwrap_or(1);
+        let size = size.unwrap_or(20);
+
+        if transaction_hash.is_empty() {
+            return Err(anyhow::anyhow!("Transaction hash is required"));
+        }
+        if page < 1 {
+            return Err(anyhow::anyhow!("Page must be >= 1"));
+        }
+        if size < 1 || size > 2000 {
+            return Err(anyhow::anyhow!("Size must be between 1 and 2000"));
+        }
+
+        let url = format!(
+            "{}api/v1/transactions/{}/nft-transfers?page={}&size={}",
+            self.base_url, transaction_hash, page, size
+        );
+
         self.fetch_api(&url).await
     }
 }
